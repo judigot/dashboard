@@ -20,17 +20,23 @@
   z-index: 99999;
   touch-action: none;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.bubble:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 28px rgba(102, 126, 234, 0.5);
+@media (hover: hover) {
+  .bubble:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(102, 126, 234, 0.5);
+  }
+}
+
+.bubble:active {
+  transform: scale(0.95);
 }
 
 .bubble:active,
 .bubble.dragging {
   cursor: grabbing;
-  transform: scale(1.05);
 }
 
 .devIndicator {
@@ -82,8 +88,8 @@
 }
 
 .minimizeButton {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.2);
@@ -94,11 +100,16 @@
   justify-content: center;
   transition: background 0.2s ease, transform 0.2s ease;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .minimizeButton:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
+}
+
+.minimizeButton:active {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .iframe {
@@ -115,5 +126,10 @@
 
   .title {
     font-size: 14px;
+  }
+
+  .minimizeButton {
+    width: 48px;
+    height: 48px;
   }
 }
