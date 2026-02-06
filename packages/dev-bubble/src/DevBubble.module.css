@@ -52,7 +52,7 @@
   pointer-events: none;
 }
 
-/* Maximized Panel (fullscreen overlay) */
+/* Maximized Panel (fullscreen overlay) — always mounted to preserve iframe state */
 .panel {
   position: fixed;
   inset: 0;
@@ -60,16 +60,14 @@
   z-index: 99998;
   display: flex;
   flex-direction: column;
-  animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Hidden state — off-screen + no pointer events, keeps iframe alive */
+.panelHidden {
+  visibility: hidden;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
 }
 
 .header {

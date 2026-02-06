@@ -130,68 +130,67 @@ export function DevBubble({
 
   return (
     <div className={styles.container}>
-      {isOpen && (
-        <div className={styles.panel}>
-          {/* Header */}
-          <div className={styles.header}>
-            <span className={styles.title}>OpenCode</span>
-            <button
-              className={styles.minimizeButton}
-              onClick={() => setIsOpen(false)}
-              aria-label="Minimize"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Workspace nav */}
-          {showNav && (
-            <div className={styles.nav}>
-              {onGoHome !== undefined && (
-                <button
-                  className={`${styles.navItem} ${activeSlug === null ? styles.navActive : ""}`}
-                  onClick={() => {
-                    onGoHome();
-                    setIsOpen(false);
-                  }}
-                >
-                  <span className={styles.navIcon}>
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                    </svg>
-                  </span>
-                  <span>Home</span>
-                </button>
-              )}
-              {apps.map((app) => (
-                <button
-                  key={app.slug}
-                  className={`${styles.navItem} ${app.slug === activeSlug ? styles.navActive : ""}`}
-                  onClick={() => {
-                    onSelectApp?.(app);
-                    setIsOpen(false);
-                  }}
-                >
-                  <span
-                    className={`${styles.navDot} ${app.status === "up" ? styles.navDotUp : styles.navDotDown}`}
-                  />
-                  <span>{app.slug}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* OpenCode iframe */}
-          <iframe
-            src={url}
-            className={styles.iframe}
-            title="OpenCode"
-            allow="clipboard-read; clipboard-write; microphone"
-          />
+      {/* Panel — always mounted so the iframe preserves state */}
+      <div className={`${styles.panel} ${isOpen ? "" : styles.panelHidden}`}>
+        {/* Header */}
+        <div className={styles.header}>
+          <span className={styles.title}>OpenCode</span>
+          <button
+            className={styles.minimizeButton}
+            onClick={() => setIsOpen(false)}
+            aria-label="Minimize"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M19 13H5v-2h14v2z" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        {/* Workspace nav */}
+        {showNav && (
+          <div className={styles.nav}>
+            {onGoHome !== undefined && (
+              <button
+                className={`${styles.navItem} ${activeSlug === null ? styles.navActive : ""}`}
+                onClick={() => {
+                  onGoHome();
+                  setIsOpen(false);
+                }}
+              >
+                <span className={styles.navIcon}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                  </svg>
+                </span>
+                <span>Home</span>
+              </button>
+            )}
+            {apps.map((app) => (
+              <button
+                key={app.slug}
+                className={`${styles.navItem} ${app.slug === activeSlug ? styles.navActive : ""}`}
+                onClick={() => {
+                  onSelectApp?.(app);
+                  setIsOpen(false);
+                }}
+              >
+                <span
+                  className={`${styles.navDot} ${app.status === "up" ? styles.navDotUp : styles.navDotDown}`}
+                />
+                <span>{app.slug}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* OpenCode iframe */}
+        <iframe
+          src={url}
+          className={styles.iframe}
+          title="OpenCode"
+          allow="clipboard-read; clipboard-write; microphone"
+        />
+      </div>
 
       {!isOpen && (
         <button
