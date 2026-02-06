@@ -43,40 +43,36 @@ function App() {
     };
   }, [fetchApps]);
 
-  /* App view — fullscreen iframe with back button */
+  const opencodeUrl =
+    config !== null
+      ? `https://${config.opencodeDomain}/`
+      : "https://opencode.judigot.com/";
+
+  /* App view — fullscreen iframe, no nav bar, only DevBubble */
   if (activeApp !== null) {
     return (
       <div className="app-view">
-        <div className="app-view-bar">
-          <button
-            className="back-button"
-            onClick={() => {
-              setActiveApp(null);
-            }}
-          >
-            &larr; Apps
-          </button>
-          <span className="app-view-title">{activeApp.slug}</span>
-          <span className="app-view-url">{activeApp.url}</span>
-        </div>
         <iframe
           src={activeApp.url}
           className="app-view-frame"
           title={activeApp.slug}
           allow="clipboard-read; clipboard-write"
         />
-        <DevBubble
-          url={
-            config !== null
-              ? `https://${config.opencodeDomain}/`
-              : "https://opencode.judigot.com/"
-          }
-        />
+        <button
+          className="back-fab"
+          onClick={() => {
+            setActiveApp(null);
+          }}
+          aria-label="Back to apps"
+        >
+          &larr;
+        </button>
+        <DevBubble url={opencodeUrl} />
       </div>
     );
   }
 
-  /* Dashboard view */
+  /* Dashboard view — no bubble */
   return (
     <div className="dashboard">
       <div className="dashboard-content">
@@ -114,7 +110,7 @@ function App() {
             </button>
           )}
 
-          {/* Vite app cards */}
+          {/* App cards */}
           {config?.apps.map((appItem) => (
             <button
               key={appItem.slug}
@@ -145,14 +141,6 @@ function App() {
           )}
         </div>
       </div>
-
-      <DevBubble
-        url={
-          config !== null
-            ? `https://${config.opencodeDomain}/`
-            : "https://opencode.judigot.com/"
-        }
-      />
     </div>
   );
 }
