@@ -234,41 +234,6 @@ body {
   background: white;
 }
 
-/* Floating back button — small circle, top-left */
-.back-fab {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(15, 17, 21, 0.85);
-  backdrop-filter: blur(8px);
-  color: var(--text);
-  font-size: 1.125rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.15s;
-  opacity: 0.7;
-}
-
-.back-fab:active {
-  opacity: 1;
-  transform: scale(0.92);
-}
-
-@media (hover: hover) {
-  .back-fab:hover {
-    opacity: 1;
-  }
-}
-
 /* ── Mobile ── */
 
 @media (max-width: 600px) {

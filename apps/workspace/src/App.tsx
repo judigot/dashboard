@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { DevBubble } from "@dashboard/dev-bubble";
+import type { IBubbleApp } from "@dashboard/dev-bubble";
 
 interface IApp {
   slug: string;
@@ -48,6 +49,14 @@ function App() {
       ? `https://${config.opencodeDomain}/`
       : "https://opencode.judigot.com/";
 
+  /* Build bubble app list from config */
+  const bubbleApps: IBubbleApp[] =
+    config?.apps.map((a) => ({
+      slug: a.slug,
+      url: a.url,
+      status: a.status,
+    })) ?? [];
+
   /* App view — fullscreen iframe, no nav bar, only DevBubble */
   if (activeApp !== null) {
     return (
@@ -58,16 +67,16 @@ function App() {
           title={activeApp.slug}
           allow="clipboard-read; clipboard-write"
         />
-        <button
-          className="back-fab"
-          onClick={() => {
-            setActiveApp(null);
+        <DevBubble
+          url={opencodeUrl}
+          apps={bubbleApps}
+          activeSlug={activeApp.slug}
+          onSelectApp={(app) => {
+            const found = config?.apps.find((a) => a.slug === app.slug);
+            if (found) setActiveApp(found);
           }}
-          aria-label="Back to apps"
-        >
-          &larr;
-        </button>
-        <DevBubble url={opencodeUrl} />
+          onGoHome={() => setActiveApp(null)}
+        />
       </div>
     );
   }

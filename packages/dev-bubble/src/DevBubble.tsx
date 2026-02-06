@@ -1,11 +1,23 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./DevBubble.module.css";
 
+export interface IBubbleApp {
+  slug: string;
+  url: string;
+  status: "up" | "down" | "unknown";
+}
+
 interface IDevBubbleProps {
-  /** URL to load in the fullscreen iframe (e.g. https://opencode.judigot.com) */
+  /** URL to load in the OpenCode iframe */
   url?: string;
-  /** Title shown in the fullscreen header */
-  title?: string;
+  /** List of workspace apps to show in the nav */
+  apps?: IBubbleApp[];
+  /** Currently active app slug (highlighted in nav) */
+  activeSlug?: string | null;
+  /** Called when user taps an app in the nav */
+  onSelectApp?: (app: IBubbleApp) => void;
+  /** Called when user taps "Home" to go back to dashboard */
+  onGoHome?: () => void;
 }
 
 interface IPosition {
@@ -15,7 +27,10 @@ interface IPosition {
 
 export function DevBubble({
   url = "https://opencode.judigot.com",
-  title = "OpenCode",
+  apps = [],
+  activeSlug = null,
+  onSelectApp,
+  onGoHome,
 }: IDevBubbleProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<IPosition>({ x: 0, y: 0 });
@@ -24,7 +39,6 @@ export function DevBubble({
   const [hasDragged, setHasDragged] = useState(false);
   const bubbleRef = useRef<HTMLButtonElement>(null);
 
-  /* Initialize position to bottom-right corner */
   useEffect(() => {
     const updatePosition = () => {
       setPosition({
@@ -41,55 +55,36 @@ export function DevBubble({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (isOpen) {
-        return;
-      }
+      if (isOpen) return;
       setIsDragging(true);
       setHasDragged(false);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      });
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
     },
     [isOpen, position],
   );
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!isDragging) {
-        return;
-      }
+      if (!isDragging) return;
       setHasDragged(true);
-      const newX = Math.max(
-        0,
-        Math.min(window.innerWidth - 60, e.clientX - dragStart.x),
-      );
-      const newY = Math.max(
-        0,
-        Math.min(window.innerHeight - 60, e.clientY - dragStart.y),
-      );
-      setPosition({ x: newX, y: newY });
+      setPosition({
+        x: Math.max(0, Math.min(window.innerWidth - 60, e.clientX - dragStart.x)),
+        y: Math.max(0, Math.min(window.innerHeight - 60, e.clientY - dragStart.y)),
+      });
     },
     [isDragging, dragStart],
   );
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (isOpen) {
-        return;
-      }
+      if (isOpen) return;
       const touch = e.touches[0];
       if (touch) {
         setIsDragging(true);
         setHasDragged(false);
-        setDragStart({
-          x: touch.clientX - position.x,
-          y: touch.clientY - position.y,
-        });
+        setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
       }
     },
     [isOpen, position],
@@ -97,29 +92,20 @@ export function DevBubble({
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
-      if (!isDragging) {
-        return;
-      }
+      if (!isDragging) return;
       const touch = e.touches[0];
       if (touch) {
         setHasDragged(true);
-        const newX = Math.max(
-          0,
-          Math.min(window.innerWidth - 60, touch.clientX - dragStart.x),
-        );
-        const newY = Math.max(
-          0,
-          Math.min(window.innerHeight - 60, touch.clientY - dragStart.y),
-        );
-        setPosition({ x: newX, y: newY });
+        setPosition({
+          x: Math.max(0, Math.min(window.innerWidth - 60, touch.clientX - dragStart.x)),
+          y: Math.max(0, Math.min(window.innerHeight - 60, touch.clientY - dragStart.y)),
+        });
       }
     },
     [isDragging, dragStart],
   );
 
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  const handleTouchEnd = useCallback(() => setIsDragging(false), []);
 
   useEffect(() => {
     if (isDragging) {
@@ -134,47 +120,74 @@ export function DevBubble({
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [
-    isDragging,
-    handleMouseMove,
-    handleMouseUp,
-    handleTouchMove,
-    handleTouchEnd,
-  ]);
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   const handleClick = () => {
-    if (!hasDragged) {
-      setIsOpen(!isOpen);
-    }
+    if (!hasDragged) setIsOpen(!isOpen);
   };
+
+  const showNav = apps.length > 0 || onGoHome !== undefined;
 
   return (
     <div className={styles.container}>
       {isOpen && (
         <div className={styles.panel}>
+          {/* Header */}
           <div className={styles.header}>
-            <span className={styles.title}>{title}</span>
+            <span className={styles.title}>OpenCode</span>
             <button
               className={styles.minimizeButton}
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              aria-label={`Minimize ${title}`}
+              onClick={() => setIsOpen(false)}
+              aria-label="Minimize"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="20"
-                height="20"
-              >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M19 13H5v-2h14v2z" />
               </svg>
             </button>
           </div>
+
+          {/* Workspace nav */}
+          {showNav && (
+            <div className={styles.nav}>
+              {onGoHome !== undefined && (
+                <button
+                  className={`${styles.navItem} ${activeSlug === null ? styles.navActive : ""}`}
+                  onClick={() => {
+                    onGoHome();
+                    setIsOpen(false);
+                  }}
+                >
+                  <span className={styles.navIcon}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                    </svg>
+                  </span>
+                  <span>Home</span>
+                </button>
+              )}
+              {apps.map((app) => (
+                <button
+                  key={app.slug}
+                  className={`${styles.navItem} ${app.slug === activeSlug ? styles.navActive : ""}`}
+                  onClick={() => {
+                    onSelectApp?.(app);
+                    setIsOpen(false);
+                  }}
+                >
+                  <span
+                    className={`${styles.navDot} ${app.status === "up" ? styles.navDotUp : styles.navDotDown}`}
+                  />
+                  <span>{app.slug}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* OpenCode iframe */}
           <iframe
             src={url}
             className={styles.iframe}
-            title={title}
+            title="OpenCode"
             allow="clipboard-read; clipboard-write; microphone"
           />
         </div>
@@ -191,14 +204,9 @@ export function DevBubble({
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
           onClick={handleClick}
-          aria-label={`Open ${title}`}
+          aria-label="Open assistant"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            width="28"
-            height="28"
-          >
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
           </svg>
         </button>
