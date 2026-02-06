@@ -1,5 +1,5 @@
 {
-  "name": "@bigbang/eslint-config",
+  "name": "@dashboard/eslint-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",

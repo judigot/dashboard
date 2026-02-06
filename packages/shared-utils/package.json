@@ -1,5 +1,5 @@
 {
-  "name": "@bigbang/shared-utils",
+  "name": "@dashboard/shared-utils",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -26,6 +26,6 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "@bigbang/tsconfig": "workspace:*"
+    "@dashboard/tsconfig": "workspace:*"
   }
 }
